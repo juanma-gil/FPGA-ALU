@@ -24,11 +24,14 @@ module alu(
         input [`BUS_SIZE - 1 : 0] in_a, in_b,
         input [`BUS_OP_SIZE - 1 : 0] in_op,
         output [`BUS_SIZE - 1 : 0] out_led,
-        output out_carry
+        output out_carry,
+        output out_zero
     );
     reg[`BUS_SIZE : 0] result; //tiene un bit extra para el carry
     assign out_led = result; //7:0
     assign out_carry = result[`BUS_SIZE];
+    assign out_zero = ~|out_led;
+    
     always @(*)      
     begin
         case(in_op)
@@ -68,7 +71,8 @@ module tb_alu;
             in_a, in_b,  // ALU N-bit Inputs                 
             in_op,// ALU Operation
             out_led, // ALU 8-bit Output
-            out_carry // Carry Out Flag
+            out_carry, // Carry Out Flag,
+            out_zero // Zero Out Flag
         );
     initial begin
     // hold reset state for 100 ns.
