@@ -1,22 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 09/04/2022 01:50:53 PM
-// Design Name: 
-// Module Name: alu
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 `timescale 1ns / 1ps
 
 module alu#(
@@ -38,13 +19,7 @@ module alu#(
         
         parameter OP_SRL = 6'b000010,
         
-        parameter OP_NOR = 6'b100111,
-        
-        parameter IN_A = 8'h8B, // 139 representado en hexa de N bits
-        
-        parameter IN_B = 8'h02, // 2 representado en hexa de N bits
-        
-        parameter IN_OP = 6'h0 // operaci�n 0 representada en un hexa de M bits)
+        parameter OP_NOR = 6'b100111
     )(
         input [BUS_SIZE - 1 : 0] in_a, in_b,
         input [BUS_OP_SIZE - 1 : 0] in_op,
@@ -103,7 +78,7 @@ module tb_alu;
     
     localparam OP_NOR = 6'b100111;
     
-    localparam IN_A = 8'h8B; // 139 representado en hexa de N bits
+    localparam IN_A = 8'hFF; // 255 representado en hexa de N bits
     
     localparam IN_B = 8'h02; // 2 representado en hexa de N bits
     
