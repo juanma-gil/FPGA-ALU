@@ -13,6 +13,7 @@ module alu#(
         parameter OP_SRL = 6'b000010,
         parameter OP_NOR = 6'b100111
     )(
+        input clk,
         input [BUS_BIT_ENABLE - 1 : 0] in_en,
         input [BUS_SIZE - 1 : 0] in_a, in_b,
         input [BUS_OP_SIZE - 1 : 0] in_op,
@@ -29,7 +30,7 @@ module alu#(
     assign out_carry = result[BUS_SIZE];
     assign out_zero = ~|out_led;
     
-    always @(*)      
+    always @(posedge clk)  
     begin
         data_a = in_en[0] == 1 ? in_a : data_a;
         data_b = in_en[1] == 1 ? in_b : data_b;
@@ -69,22 +70,25 @@ module tb_alu;
     localparam OP_SRA = 6'b000011;    
     localparam OP_SRL = 6'b000010;    
     localparam OP_NOR = 6'b100111;
+    localparam IN_CLK = 1'b0;
     localparam IN_EN = 3'b000;
     localparam IN_A = 8'hFF; // 255 representado en hexa de N bits    
     localparam IN_B = 8'h02; // 2 representado en hexa de N bits    
     localparam IN_OP = 6'h0; // operaci�n 0 representada en un hexa de M bits
 
     //Inputs
+    reg clk;
     reg[BUS_BIT_ENABLE -1 : 0] in_en;
     reg[BUS_SIZE - 1 :0] in_a, in_b;
     reg[BUS_OP_SIZE - 1 : 0] in_op;
-
+    
     //Outputs
     wire[BUS_SIZE - 1 : 0] out_led;
     wire out_carry;
 
     // Verilog code for ALU
     alu test_unit(
+            clk,
             in_en,
             in_a, in_b,  // ALU N-bit Inputs                 
             in_op,// ALU Operation
@@ -93,6 +97,7 @@ module tb_alu;
             out_zero // Zero Out Flag
         );
     initial begin
+        clk = IN_CLK;
         in_en = IN_EN;
         in_a = IN_A; // 139 representado en hexa de N bits
         in_b = IN_B; // 2 representado en hexa de N bits
@@ -149,5 +154,10 @@ module tb_alu;
         in_en[2] = 0;
         #10
         $finish;
+    end
+    
+    always begin
+        #1
+        clk = ~clk;
     end
 endmodule
