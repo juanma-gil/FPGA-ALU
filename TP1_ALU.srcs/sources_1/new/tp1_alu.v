@@ -1,98 +1,153 @@
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 09/04/2022 01:50:53 PM
-// Design Name: 
-// Module Name: alu
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 `timescale 1ns / 1ps
-`define BUS_SIZE 8 
-`define BUS_OP_SIZE 6
-module alu(
-        input [`BUS_SIZE - 1 : 0] in_a, in_b,
-        input [`BUS_OP_SIZE - 1 : 0] in_op,
-        output [`BUS_SIZE - 1 : 0] out_led,
-        output out_carry
+
+module alu#(
+        parameter BUS_OP_SIZE = 6,
+        parameter BUS_SIZE = 8,
+        parameter BUS_BIT_ENABLE = 3,
+        parameter OP_ADD = 6'b100000,
+        parameter OP_SUB = 6'b100010,
+        parameter OP_AND = 6'b100100,
+        parameter OP_OR = 6'b100101,
+        parameter OP_XOR = 6'b100110,
+        parameter OP_SRA = 6'b000011,
+        parameter OP_SRL = 6'b000010,
+        parameter OP_NOR = 6'b100111
+    )(
+        input [BUS_BIT_ENABLE - 1 : 0] in_en,
+        input [BUS_SIZE - 1 : 0] in_a, in_b,
+        input [BUS_OP_SIZE - 1 : 0] in_op,
+        output [BUS_SIZE - 1 : 0] out_led,
+        output out_carry,
+        output out_zero
     );
-    reg[`BUS_SIZE : 0] result; //tiene un bit extra para el carry
+    reg [BUS_SIZE - 1 : 0] data_a; 
+    reg [BUS_SIZE - 1 : 0] data_b; 
+    reg [BUS_OP_SIZE - 1 : 0] data_op; 
+
+    reg[BUS_SIZE : 0] result; //tiene un bit extra para el carry
     assign out_led = result; //7:0
-    assign out_carry = result[`BUS_SIZE];
+    assign out_carry = result[BUS_SIZE];
+    assign out_zero = ~|out_led;
+    
     always @(*)      
     begin
-        case(in_op)
-            `BUS_OP_SIZE'b100000: // Addition
-                result = {1'b0, in_a} + {1'b0, in_b}; 
-            `BUS_OP_SIZE'b100010: // Subtraction
-                result = in_a - in_b ;
-            `BUS_OP_SIZE'b100100: //  Logical and 
-                result = in_a & in_b;
-            `BUS_OP_SIZE'b100101: //  Logical or
-                result = in_a | in_b;
-            `BUS_OP_SIZE'b100110: //  Logical xor 
-                result = in_a ^ in_b;
-            `BUS_OP_SIZE'b000011: // SRA 
-                result = {in_a[0], in_a[`BUS_SIZE - 1], in_a[`BUS_SIZE - 1 : 1]};
-            `BUS_OP_SIZE'b000010: // SRL
-                result = {in_a[0], in_a >> 1};
-            `BUS_OP_SIZE'b100111: // Logical nor
-                result = ~(in_a | in_b);
-            default: result = in_a + in_b ; 
+        data_a = in_en[0] == 1 ? in_a : data_a;
+        data_b = in_en[1] == 1 ? in_b : data_b;
+        data_op = in_en[2] == 1 ? in_op : data_op;
+            
+        case(data_op)
+            OP_ADD: // Addition
+                result = {1'b0, data_a} + {1'b0, data_b}; 
+            OP_SUB: // Subtraction
+                result = data_a - data_b ;
+            OP_AND: //  Logical and 
+                result = data_a & data_b;
+            OP_OR: //  Logical or
+                result = data_a | data_b;
+            OP_XOR: //  Logical xor 
+                result = data_a ^ data_b;
+            OP_SRA: // SRA 
+                result = {data_a[0], data_a[BUS_SIZE - 1], data_a[BUS_SIZE - 1 : 1]};
+            OP_SRL: // SRL
+                result = {data_a[0], data_a >> 1};
+            OP_NOR: // Logical nor
+                result = ~(data_a | data_b);
+            default: result = data_a + data_b ; 
         endcase
     end
 endmodule
 
-
 module tb_alu;
+    localparam BUS_OP_SIZE = 6;
+    localparam BUS_SIZE = 8;   
+    localparam BUS_BIT_ENABLE = 3;
+    localparam OP_ADD = 6'b100000;    
+    localparam OP_SUB = 6'b100010;    
+    localparam OP_AND = 6'b100100;    
+    localparam OP_OR = 6'b100101;    
+    localparam OP_XOR = 6'b100110;    
+    localparam OP_SRA = 6'b000011;    
+    localparam OP_SRL = 6'b000010;    
+    localparam OP_NOR = 6'b100111;
+    localparam IN_EN = 3'b000;
+    localparam IN_A = 8'hFF; // 255 representado en hexa de N bits    
+    localparam IN_B = 8'h02; // 2 representado en hexa de N bits    
+    localparam IN_OP = 6'h0; // operaciï¿½n 0 representada en un hexa de M bits
+
     //Inputs
-    reg[`BUS_SIZE - 1 :0] in_a, in_b;
-    reg[`BUS_OP_SIZE - 1 : 0] in_op;
+    reg[BUS_BIT_ENABLE -1 : 0] in_en;
+    reg[BUS_SIZE - 1 :0] in_a, in_b;
+    reg[BUS_OP_SIZE - 1 : 0] in_op;
 
     //Outputs
-    wire[`BUS_SIZE - 1 : 0] out_led;
+    wire[BUS_SIZE - 1 : 0] out_led;
     wire out_carry;
 
     // Verilog code for ALU
     alu test_unit(
+            in_en,
             in_a, in_b,  // ALU N-bit Inputs                 
             in_op,// ALU Operation
             out_led, // ALU 8-bit Output
-            out_carry // Carry Out Flag
+            out_carry, // Carry Out Flag,
+            out_zero // Zero Out Flag
         );
     initial begin
-    // hold reset state for 100 ns.
-        in_a = `BUS_SIZE'h8B; // 139 representado en hexa de N bits
-        in_b = `BUS_SIZE'h02; // 2 representado en hexa de N bits
-        in_op = `BUS_OP_SIZE'h0; // operación 0 representada en un hexa de M bits
-        
-        in_op = `BUS_OP_SIZE'b100000; // Addition
+        in_en = IN_EN;
+        in_a = IN_A; // 139 representado en hexa de N bits
+        in_b = IN_B; // 2 representado en hexa de N bits
+        in_op = IN_OP; // operaciï¿½n 0 representada en un hexa de M bits
+        #5
+        in_en[0] = 1;
+        #5
+        in_en[0] = 0;
+        in_en[1] = 1;
+        #5
+        in_en[1] = 0;
+        in_en[2] = 1;
+        #5
+        in_en[2] = 0;
+
+        in_op = OP_ADD; // Addition
+        in_en[2] = 1;
+        #2
+        in_en[2] = 0;
         #10;
-        in_op = `BUS_OP_SIZE'b100010; // Subtraction
+        in_op = OP_SUB; // Subtraction
+        in_en[2] = 1;
+        #2
+        in_en[2] = 0;
         #10;
-        in_op = `BUS_OP_SIZE'b100100; //  Logical and 
+        in_op = OP_AND; //  Logical and 
+        in_en[2] = 1;
+        #2
+        in_en[2] = 0;
         #10;
-        in_op = `BUS_OP_SIZE'b100101; //  Logical or
+        in_op = OP_OR; //  Logical or
+        in_en[2] = 1;
+        #2
+        in_en[2] = 0;
         #10;
-        in_op = `BUS_OP_SIZE'b100110; //  Logical xor 
+        in_op = OP_XOR; //  Logical xor 
+        in_en[2] = 1;
+        #2
+        in_en[2] = 0;
         #10;
-        in_op = `BUS_OP_SIZE'b000011; // SRA 
+        in_op = OP_SRA; // SRA 
+        in_en[2] = 1;
+        #2
+        in_en[2] = 0;
         #10;
-        in_op = `BUS_OP_SIZE'b000010; // SRL
+        in_op = OP_SRL; // SRL
+        in_en[2] = 1;
+        #2
+        in_en[2] = 0;
         #10;
-        in_op = `BUS_OP_SIZE'b100111; // Logical nor
-        #10;
-        
+        in_op = OP_NOR; // Logical nor
+        in_en[2] = 1;
+        #2
+        in_en[2] = 0;
+        #10
         $finish;
     end
 endmodule
