@@ -20,8 +20,7 @@ module tb_alu;
     //Inputs
     reg i_clk;
     reg[BUS_BIT_ENABLE -1 : 0] i_en;
-    reg[BUS_SIZE - 1 :0] i_data_a, i_data_b;
-    reg[BUS_OP_SIZE - 1 : 0] i_operation;
+    reg[BUS_SIZE - 1 :0] i_switch;
     
     //Outputs
     wire[BUS_SIZE - 1 : 0] o_led;
@@ -32,10 +31,7 @@ module tb_alu;
     alu test_unit(
             i_clk,
             i_en,
-            i_data_a, i_data_b
-,  // ALU N-bit Inputs                 
-            i_operation
-,// ALU Operation
+            i_switch,  // ALU N-bit Inputs                 
             o_led, // ALU 8-bit Output
             o_carry_bit
 , // Carry Out Flag,
@@ -44,56 +40,56 @@ module tb_alu;
     initial begin
         i_clk = I_CLK;
         i_en = I_EN;
-        i_data_a = I_DATA_A; // 255 representado en hexa de N bits
-        i_data_b = I_DATA_B; // 2 representado en hexa de N bits
-        i_operation = I_OPERATION; // operaci�n 0 representada en un hexa de M bits
+        i_switch = I_DATA_A; // 255 representado en hexa de N bits
         #5
         i_en[0] = 1;
         #5
         i_en[0] = 0;
+        i_switch = I_DATA_B; // 2 representado en hexa de N bits
         i_en[1] = 1;
         #5
         i_en[1] = 0;
+        i_switch = I_OPERATION; // operaci�n 0 representada en un hexa de M bits
         i_en[2] = 1;
         #5
         i_en[2] = 0;
 
-        i_operation = OP_ADD; // Addition
+        i_switch = OP_ADD; // Addition
         i_en[2] = 1;
         #2
         i_en[2] = 0;
         #10;
-        i_operation = OP_SUB; // Subtraction
+        i_switch = OP_SUB; // Subtraction
         i_en[2] = 1;
         #2
         i_en[2] = 0;
         #10;
-        i_operation = OP_AND; //  Logical and 
+        i_switch = OP_AND; //  Logical and 
         i_en[2] = 1;
         #2
         i_en[2] = 0;
         #10;
-        i_operation = OP_OR; //  Logical or
+        i_switch = OP_OR; //  Logical or
         i_en[2] = 1;
         #2
         i_en[2] = 0;
         #10;
-        i_operation = OP_XOR; //  Logical xor 
+        i_switch = OP_XOR; //  Logical xor 
         i_en[2] = 1;
         #2
         i_en[2] = 0;
         #10;
-        i_operation = OP_SRA; // SRA 
+        i_switch = OP_SRA; // SRA 
         i_en[2] = 1;
         #2
         i_en[2] = 0;
         #10;
-        i_operation = OP_SRL; // SRL
+        i_switch = OP_SRL; // SRL
         i_en[2] = 1;
         #2
         i_en[2] = 0;
         #10;
-        i_operation = OP_NOR; // Logical nor
+        i_switch = OP_NOR; // Logical nor
         i_en[2] = 1;
         #2
         i_en[2] = 0;

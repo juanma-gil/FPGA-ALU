@@ -7,8 +7,7 @@ module alu#(
     )(
         input i_clk,
         input [BUS_BIT_ENABLE - 1 : 0] i_en,
-        input [BUS_SIZE - 1 : 0] i_data_a, i_data_b,
-        input [BUS_OP_SIZE - 1 : 0] i_operation,
+        input [BUS_SIZE - 1 : 0] i_switch,
         output [BUS_SIZE - 1 : 0] o_led,
         output o_carry_bit,
         output o_zero_bit
@@ -33,9 +32,9 @@ module alu#(
     
     always @(posedge i_clk)  
     begin
-        data_a = i_en[0] == 1 ? i_data_a : data_a;
-        data_b = i_en[1] == 1 ? i_data_b : data_b;
-        data_operation = i_en[2] == 1 ? i_operation : data_operation;
+        data_a = i_en[0] == 1 ? i_switch : data_a;
+        data_b = i_en[1] == 1 ? i_switch : data_b;
+        data_operation = i_en[2] == 1 ? i_switch : data_operation;
             
         case(data_operation)
             OP_ADD: // Addition
