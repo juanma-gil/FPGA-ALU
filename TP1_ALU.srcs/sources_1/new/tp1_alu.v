@@ -5,13 +5,14 @@ module alu#(
         parameter BUS_SIZE = 8,
         parameter BUS_BIT_ENABLE = 3
     )(
-        input i_clk,
-        input [BUS_BIT_ENABLE - 1 : 0] i_en,
-        input [BUS_SIZE - 1 : 0] i_switch,
+        input [BUS_SIZE - 1 : 0] data_a,
+        input [BUS_SIZE - 1 : 0] data_b,
+        input [BUS_OP_SIZE - 1 : 0] data_operation,
         output [BUS_SIZE - 1 : 0] o_led,
         output o_carry_bit,
         output o_zero_bit
     );
+            
     localparam OP_ADD = 6'b100000;
     localparam OP_SUB = 6'b100010;
     localparam OP_AND = 6'b100100;
@@ -21,21 +22,14 @@ module alu#(
     localparam OP_SRL = 6'b000010;
     localparam OP_NOR = 6'b100111;
 
-    reg [BUS_SIZE - 1 : 0] data_a; 
-    reg [BUS_SIZE - 1 : 0] data_b; 
-    reg [BUS_OP_SIZE - 1 : 0] data_operation; 
-
     reg[BUS_SIZE : 0] result; //tiene un bit extra para el carry
+    
     assign o_led = result; //7:0
     assign o_carry_bit = result[BUS_SIZE];
     assign o_zero_bit = ~|o_led;
     
-    always @(posedge i_clk)  
-    begin
-        data_a = i_en[0] == 1 ? i_switch : data_a;
-        data_b = i_en[1] == 1 ? i_switch : data_b;
-        data_operation = i_en[2] == 1 ? i_switch : data_operation;
-            
+    always @(*)  
+    begin    
         case(data_operation)
             OP_ADD: // Addition
                 result = {1'b0, data_a} + {1'b0, data_b}; 

@@ -18,27 +18,23 @@ module tb_alu;
     localparam OP_SRL = 6'b000010;
     localparam OP_NOR = 6'b100111;
     //Inputs
-    reg i_clk;
     reg[BUS_BIT_ENABLE -1 : 0] i_en;
     reg[BUS_SIZE - 1 :0] i_switch;
     
     //Outputs
-    wire[BUS_SIZE - 1 : 0] o_led;
+    wire[BUS_SIZE - 1 : 0] o_leds;
     wire o_carry_bit;
     wire o_zero_bit;
 
     // Verilog code for ALU
-    alu test_unit(
-            i_clk,
+    io_interface test_unit(
+            i_switch,  // ALU N-bit Inputs
             i_en,
-            i_switch,  // ALU N-bit Inputs                 
-            o_led, // ALU 8-bit Output
-            o_carry_bit
-, // Carry Out Flag,
-            o_zero_bit // Zero Out Flag
+            o_leds,
+            o_carry_bit,
+            o_zero_bit
         );
     initial begin
-        i_clk = I_CLK;
         i_en = I_EN;
         i_switch = I_DATA_A; // 255 representado en hexa de N bits
         #5
@@ -95,10 +91,5 @@ module tb_alu;
         i_en[2] = 0;
         #10
         $finish;
-    end
-    
-    always begin
-        #1
-        i_clk = ~i_clk;
     end
 endmodule
