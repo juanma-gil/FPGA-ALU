@@ -20,12 +20,13 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module top#(
+module alu_top#(
         parameter BUS_OP_SIZE = 6,
         parameter BUS_SIZE = 8,
         parameter BUS_BIT_ENABLE = 3
     )(
         input i_clk,
+        input reset,
         input [BUS_BIT_ENABLE - 1 : 0] i_en,
         input [BUS_SIZE - 1 : 0] i_switch,
         output [BUS_SIZE - 1 : 0] o_led,
@@ -39,6 +40,7 @@ module top#(
     
     latch enable_values(
         .i_clk(i_clk),
+        .reset(reset),
         .i_en(i_en),
         .i_switch(i_switch),
         .o_data_a(data_a),
