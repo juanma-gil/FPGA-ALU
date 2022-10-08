@@ -35,7 +35,9 @@ module alu_top#(
     );
 
     wire [BUS_SIZE*3 - 1 : 0] data1;
-    wire [BUS_SIZE*3 - 1 : 0] data2;  
+    wire [BUS_SIZE - 1 : 0] data_a;  
+    wire [BUS_SIZE - 1 : 0] data_b;
+    wire [BUS_SIZE - 1 : 0] data_c;
     
     demux#(
         .BITS_ENABLES(2),
@@ -46,18 +48,29 @@ module alu_top#(
         .o_data(data1) 
     );
     
-    latch #(.BUS_DATA(BUS_SIZE*3)) enable_values(
-        .i_clk(i_clk),
+    latch #(.BUS_DATA(BUS_SIZE)) enable_values1(
+        .i_validation((~|i_en)&i_clk),
         .reset(reset),       
-        .i_data(data1[BUS_SIZE*3 - 1 : 0]),
-        .o_data(data2)       
+        .i_data(data1[BUS_SIZE - 1 : 0]),
+        .o_data(data_a)       
+    );
+    latch #(.BUS_DATA(BUS_SIZE)) enable_values2(
+        .i_validation((i_en[0])&i_clk),
+        .reset(reset),       
+        .i_data(data1[BUS_SIZE*2 - 1 : BUS_SIZE]),
+        .o_data(data_b)       
+    );
+    latch #(.BUS_DATA(BUS_SIZE)) enable_values3(
+        .i_validation((i_en[1])&i_clk),
+        .reset(reset),       
+        .i_data(data1[BUS_SIZE*3 - 1 : BUS_SIZE*2]),
+        .o_data(data_c)       
     );
     
-    
     alu imp_alu(
-        .i_data_a(data2[BUS_SIZE-1:0]),
-        .i_data_b(data2[BUS_SIZE*2-1:BUS_SIZE]),
-        .i_operation(data2[BUS_SIZE*3-1:BUS_SIZE*2]),
+        .i_data_a(data_a),
+        .i_data_b(data_b),
+        .i_operation(data_c),
         .o_out(o_led),
         .o_carry_bit(o_carry_bit),
         .o_zero_bit(o_zero_bit)

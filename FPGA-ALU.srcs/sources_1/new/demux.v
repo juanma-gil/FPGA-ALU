@@ -26,15 +26,10 @@ module demux#(
     )(
         input   [BITS_ENABLES - 1 : 0] i_en,
         input   [BUS_SIZE - 1 : 0] i_data,
-        output  [BUS_SIZE*BITS_ENABLES**2 - 1 : 0] o_data 
+        output  [2**BITS_ENABLES*BUS_SIZE - 1 : 0] o_data 
     );
+        
+    assign o_data = i_data<<BUS_SIZE*i_en;      
     
-    reg [BUS_SIZE*BITS_ENABLES**2 - 1 : 0] data;
-    
-    always @(*)
-        data[BUS_SIZE*i_en+:BUS_SIZE] = i_data;      
-    
-    assign o_data = data;
-
 endmodule
 
