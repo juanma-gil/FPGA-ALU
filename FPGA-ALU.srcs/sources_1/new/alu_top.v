@@ -23,7 +23,7 @@
 module alu_top#(
         parameter BUS_OP_SIZE = 6,
         parameter BUS_SIZE = 8,
-        parameter BUS_BIT_ENABLE = 3
+        parameter BUS_BIT_ENABLE = 2
     )(
         input i_clk,
         input reset,
@@ -34,25 +34,30 @@ module alu_top#(
         output o_zero_bit
     );
 
-    wire [BUS_SIZE - 1 : 0] data_a; 
-    wire [BUS_SIZE - 1 : 0] data_b; 
-    wire [BUS_OP_SIZE - 1 : 0] data_operation; 
+    wire [BUS_SIZE*3 - 1 : 0] data1;
+    wire [BUS_SIZE*3 - 1 : 0] data2;  
     
-    latch enable_values(
-        .i_clk(i_clk),
-        .reset(reset),
+    demux#(
+        .BITS_ENABLES(2),
+        .BUS_SIZE(8)
+    ) demux1(
         .i_en(i_en),
-        .i_switch(i_switch),
-        .o_data_a(data_a),
-        .o_data_b(data_b),
-        .o_data_operation(data_operation)
+        .i_data(i_switch),
+        .o_data(data1) 
+    );
+    
+    latch #(.BUS_DATA(BUS_SIZE*3)) enable_values(
+        .i_clk(i_clk),
+        .reset(reset),       
+        .i_data(data1[BUS_SIZE*3 - 1 : 0]),
+        .o_data(data2)       
     );
     
     
     alu imp_alu(
-        .i_data_a(data_a),
-        .i_data_b(data_b),
-        .i_operation(data_operation),
+        .i_data_a(data2[BUS_SIZE-1:0]),
+        .i_data_b(data2[BUS_SIZE*2-1:BUS_SIZE]),
+        .i_operation(data2[BUS_SIZE*3-1:BUS_SIZE*2]),
         .o_out(o_led),
         .o_carry_bit(o_carry_bit),
         .o_zero_bit(o_zero_bit)

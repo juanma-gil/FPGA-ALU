@@ -46,57 +46,29 @@ module tb_alu;
         i_en = I_EN;
         i_switch = I_DATA_A; // 255 representado en hexa de N bits
         #5
-        i_en[0] = 1;
+        i_en = 2'd0;
         #5
-        i_en[0] = 0;
-        i_switch = I_DATA_B; // 2 representado en hexa de N bits
-        i_en[1] = 1;
+        i_en = 2'd1;
+        i_switch = I_DATA_B; // 2 representado en hexa de N bits;
         #5
-        i_en[1] = 0;
+        i_en = 2'd2;
         i_switch = I_OPERATION; // operaci?n 0 representada en un hexa de M bits
-        i_en[2] = 1;
         #5
-        i_en[2] = 0;
-
         i_switch = OP_ADD; // Addition
-        i_en[2] = 1;
-        #2
-        i_en[2] = 0;
         #10;
         i_switch = OP_SUB; // Subtraction
-        i_en[2] = 1;
-        #2
-        i_en[2] = 0;
         #10;
         i_switch = OP_AND; //  Logical and 
-        i_en[2] = 1;
-        #2
-        i_en[2] = 0;
         #10;
         i_switch = OP_OR; //  Logical or
-        i_en[2] = 1;
-        #2
-        i_en[2] = 0;
         #10;
-        i_switch = OP_XOR; //  Logical xor 
-        i_en[2] = 1;
-        #2
-        i_en[2] = 0;
+        i_switch = OP_XOR; //  Logical xor  
         #10;
         i_switch = OP_SRA; // SRA 
-        i_en[2] = 1;
-        #2
-        i_en[2] = 0;
         #10;
         i_switch = OP_SRL; // SRL
-        i_en[2] = 1;
-        #2
-        i_en[2] = 0;
         #10;
         i_switch = OP_NOR; // Logical nor
-        i_en[2] = 1;
-        #2
-        i_en[2] = 0;
         #10
         $finish;
     end
