@@ -23,7 +23,7 @@
 module latch#(
         parameter BUS_DATA = 8
     )(
-        input i_validation,
+        input i_clock,
         input reset,
       
         input [BUS_DATA - 1 : 0] i_data,
@@ -32,7 +32,7 @@ module latch#(
     reg [BUS_DATA - 1 : 0] data_reg;     
     reg [BUS_DATA - 1 : 0] data_next; 
 
-    always @(posedge i_validation)
+    always @(posedge i_clock)
       if (reset)   
          data_reg <= 0;
       else

@@ -49,19 +49,19 @@ module alu_top#(
     );
     
     latch #(.BUS_DATA(BUS_SIZE)) enable_values1(
-        .i_validation((~|i_en)&i_clk),
+        .i_clock((~|i_en)&i_clk),
         .reset(reset),       
         .i_data(data1[BUS_SIZE - 1 : 0]),
         .o_data(data_a)       
     );
     latch #(.BUS_DATA(BUS_SIZE)) enable_values2(
-        .i_validation((i_en[0])&i_clk),
+        .i_clock((i_en[0])&i_clk),
         .reset(reset),       
         .i_data(data1[BUS_SIZE*2 - 1 : BUS_SIZE]),
         .o_data(data_b)       
     );
     latch #(.BUS_DATA(BUS_SIZE)) enable_values3(
-        .i_validation((i_en[1])&i_clk),
+        .i_clock((i_en[1])&i_clk),
         .reset(reset),       
         .i_data(data1[BUS_SIZE*3 - 1 : BUS_SIZE*2]),
         .o_data(data_c)       
