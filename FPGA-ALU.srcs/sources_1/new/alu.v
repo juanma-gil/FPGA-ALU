@@ -1,50 +1,56 @@
 `timescale 1ns / 1ps
 
 module alu#(
-        parameter BUS_OP_SIZE = 6,
-        parameter BUS_SIZE = 8,
-        parameter BUS_BIT_ENABLE = 3
+        parameter TAM_FUNC = 6,
+        parameter TAM_DATA = 32
     )(
-        input [BUS_SIZE - 1 : 0] i_data_a, i_data_b,
-        input [BUS_OP_SIZE - 1 : 0] i_operation,
-        output [BUS_SIZE - 1 : 0] o_out,
-        output o_carry_bit,
+        input [TAM_DATA - 1 : 0] i_data_a, i_data_b,
+        input [TAM_FUNC - 1 : 0] i_func,
+        output [TAM_DATA - 1 : 0] o_out,
         output o_zero_bit
     );
-    localparam OP_ADD = 6'b100000;
-    localparam OP_SUB = 6'b100010;
-    localparam OP_AND = 6'b100100;
-    localparam OP_OR = 6'b100101;
-    localparam OP_XOR = 6'b100110;
-    localparam OP_SRA = 6'b000011;
-    localparam OP_SRL = 6'b000010;
-    localparam OP_NOR = 6'b100111;
-
-    reg[BUS_SIZE : 0] result; //tiene un bit extra para el carry
-    assign o_out = result; //7:0
-    assign o_carry_bit = result[BUS_SIZE];
+    localparam SLL      =   6'b000000;  // Left  Shift i_data_b shamt  
+    localparam SRL      =   6'b000010;  // Right Shift i_data_b shamt (insertando ceros) L de logic
+    localparam SRA      =   6'b000011;  // Right Shift i_data_b shamt (Aritmetico, conservando el sig)
+    localparam SLLV     =   6'b000100;  // Left  Shift i_data_b << i_data_a
+    localparam SRLV     =   6'b000110;  // Right Shift i_data_b >> i_data_a (insertando ceros) L de logic
+    localparam SRAV     =   6'b000111;  // Right Shift i_data_b >> i_data_a (conservando signo)
+    localparam ADD      =   6'b110001;
+    localparam ADDU     =   6'b100001;  // Add unsigned
+    localparam SUBU     =   6'b100011;  // rs - rt (signed obvio)
+    localparam AND      =   6'b100100;
+    localparam OR       =   6'b100101;
+    localparam XOR      =   6'b100110;
+    localparam NOR      =   6'b100111;
+    localparam SLT      =   6'b101010;
+    localparam SHIFTLUI =   6'b101011;
+    
+    reg[TAM_DATA : 0] reg_result; //tiene un bit extra para el carry
+    assign o_out = reg_result; //7:0
     assign o_zero_bit = ~|o_out;
     
-    always @(*)  
-    begin        
-        case(i_operation)
-            OP_ADD: // Addition
-                result = {1'b0, i_data_a} + {1'b0, i_data_b}; 
-            OP_SUB: // Subtraction
-                result = i_data_a - i_data_b ;
-            OP_AND: //  Logical and 
-                result = i_data_a & i_data_b;
-            OP_OR: //  Logical or
-                result = i_data_a | i_data_b;
-            OP_XOR: //  Logical xor 
-                result = i_data_a ^ i_data_b;
-            OP_SRA: // SRA 
-                result = {i_data_a[0], i_data_a[BUS_SIZE - 1], i_data_a[BUS_SIZE - 1 : 1]};
-            OP_SRL: // SRL
-                result = {i_data_a[0], i_data_a >> 1};
-            OP_NOR: // Logical nor
-                result = ~(i_data_a | i_data_b);
-            default: result = i_data_a + i_data_b ; 
-        endcase
-    end
+always @(*)
+    case (i_func)
+        /* Shift */
+        SLL  : reg_result    = i_data_b  <<  i_data_a;
+        SRL  : reg_result    = i_data_b  >>  i_data_a;
+        SRA  : reg_result    = i_data_b >>>  i_data_a;
+        SLLV : reg_result    = i_data_b  <<  i_data_a;
+        SRLV : reg_result    = i_data_b  >>  i_data_a;
+        SRAV : reg_result    = i_data_b >>>  i_data_a;
+        SHIFTLUI: reg_result = {i_data_b[15:0],{16{1'b0}}} ;
+        /* aritmetica basica */
+        ADD  : reg_result    = $signed (i_data_a) + $signed (i_data_b);
+        ADDU : reg_result    = i_data_a + i_data_b;
+        SUBU : reg_result    = $signed (i_data_a) - $signed (i_data_b);
+        /* Logic  */
+        AND  : reg_result    =  i_data_a & i_data_b;
+        OR   : reg_result    =  i_data_a | i_data_b;
+        XOR  : reg_result    =  i_data_a ^ i_data_b;
+        NOR  : reg_result    = ~(i_data_a | i_data_b);
+        /**/
+        SLT  : reg_result    = ($signed (i_data_a) < $signed (i_data_b)) ? 'd1 : 'd0;
+        
+        default: reg_result   = {TAM_DATA{1'b1}};
+    endcase
 endmodule
