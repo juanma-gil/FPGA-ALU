@@ -24,6 +24,7 @@ module latch#(
         parameter BUS_DATA = 8
     )(
         input i_clock,
+        input i_enable,
         input reset,
       
         input [BUS_DATA - 1 : 0] i_data,
@@ -36,7 +37,8 @@ module latch#(
       if (reset)   
          data_reg <= 0;
       else
-         data_reg <= data_next;
+        if(i_enable)
+            data_reg <= data_next;
 
     always@(*)
         data_next = i_data;
