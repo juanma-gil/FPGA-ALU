@@ -31,14 +31,22 @@ module latch#(
         output  [BUS_DATA - 1 : 0]  o_data     
     );
     
-    reg [BUS_DATA - 1 : 0]  data_reg;     
+    reg [BUS_DATA - 1 : 0]  data_reg, data_next;     
     
     always @(posedge i_clock)
-      if (i_reset)   
-         data_reg <= 0;
-      else
+    begin
+        if (i_reset)   
+            data_reg <= 0;
+        else
+            data_reg <= data_next;      
+    end
+    
+    always@(*)
+    begin
+        data_next   =  data_reg;
         if(i_enable)
-            data_reg <= i_data;      
+            data_next   =   i_data;
+    end
     
     assign o_data = data_reg;
 
