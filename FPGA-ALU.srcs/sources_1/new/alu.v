@@ -34,10 +34,10 @@ always @(*)
         /* Shift */
         SLL  : reg_result    = i_data_b  <<  i_data_a;
         SRL  : reg_result    = i_data_b  >>  i_data_a;
-        SRA  : reg_result    = i_data_b >>>  i_data_a;
+        SRA  : reg_result    = $signed(i_data_b) >>>  i_data_a;
         SLLV : reg_result    = i_data_b  <<  i_data_a;
         SRLV : reg_result    = i_data_b  >>  i_data_a;
-        SRAV : reg_result    = i_data_b >>>  i_data_a;
+        SRAV : reg_result    = $signed(i_data_b) >>>  i_data_a;
         SHIFTLUI: reg_result = {i_data_b[15:0],{16{1'b0}}} ;
         /* aritmetica basica */
         ADD  : reg_result    = $signed (i_data_a) + $signed (i_data_b);
